@@ -22,6 +22,7 @@ from pocket_tts.default_parameters import (
     DEFAULT_NOISE_CLAMP,
     DEFAULT_TEMPERATURE,
     DEFAULT_VARIANT,
+    MAX_TOKEN_PER_CHUNK,
 )
 from pocket_tts.models.tts_model import TTSModel
 from pocket_tts.utils.logging_utils import enable_logging
@@ -223,6 +224,9 @@ def generate(
         str, typer.Option(help="Output path for generated audio")
     ] = "./tts_output.wav",
     device: Annotated[str, typer.Option(help="Device to use")] = "cpu",
+    max_tokens: Annotated[
+        int, typer.Option(help="Maximum number of tokens per chunk.")
+    ] = MAX_TOKEN_PER_CHUNK,
 ):
     """Generate speech using Kyutai Pocket TTS."""
     if "cuda" in device:
@@ -242,6 +246,7 @@ def generate(
             model_state=model_state_for_voice,
             text_to_generate=text,
             frames_after_eos=frames_after_eos,
+            max_tokens=max_tokens,
         )
 
         stream_audio_chunks(output_path, audio_chunks, tts_model.config.mimi.sample_rate)
